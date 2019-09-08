@@ -1,0 +1,13 @@
+BenchMark Test Using Apache Benchmarking Tool
+
+Install:  sudo apt install apache2-utils
+Use : ab -n 10000 -c 10 http://127.0.0.1:8000/
+
+    n -> number of request
+    c -> number of concurrent request (ie.no of clients/browsers connecting to the server at a time)
+
+
+To test Signal handling and restarting of workers
+
+To look for node process: ps -A | grep node
+To send SIGUSR2 signal to master process : kill -12 <pid>
