@@ -22,6 +22,26 @@ if (cluster.isMaster) {
         cluster.fork();
     });
 
+    // zero downtime implementation -> whenever master gets signal it restarts workers one by one
+    
+    const restartWorkers = () => {
+        let workerIds = Object.keys(cluster.workers);
+        
+        workerIds.forEach( wid => {
+            cluster.workers[wid].send({
+                type: 'shutdown',
+                from: 'master'
+            });
+
+            setTimeout( () => {
+                if(cluster.workers[wid]) cluster.workers[wid].kill('SIGKILL');
+            }, 5000);
+        });
+        
+    }
+    
+    process.on("SIGUSR2", restartWorkers); // restarts when master recieves SIGUSR2 (cmd for linux$ kill -12 <pid>)
+
 } // End of Master Code
 
 else  {
@@ -35,4 +55,11 @@ else  {
     server = app.listen(8000, () => {
         console.log(`Process ${process.pid} listening to all incoming requests`);
     });
+    
+    process.on('message', message => {
+        if(message.type ==='shutdown') {
+           process.exit(0); 
+        }
+    });
 }
+
