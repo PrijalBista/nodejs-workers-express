@@ -19,7 +19,7 @@ if (cluster.isMaster) {
     cluster.on('exit', (worker, code, signal) => {
         console.log(`Process ${worker.process.pid} died with code ${code} and signal ${signal}`);
         console.log('Starting a new worker');
-        client.fork();
+        cluster.fork();
     });
 
 } // End of Master Code
